@@ -1,0 +1,48 @@
+import zmq
+import time
+import thread
+
+
+
+
+#  Do 10 requests, waiting each time for a response
+def receiver():
+	context = zmq.Context()
+	print("Connecting to hello world server...")
+	socket = context.socket(zmq.REQ)
+	socket.connect("tcp://10.170.110.134:5555")
+
+	while True:
+		hi = raw_input("<you>")
+		socket.send(hi)
+		#  Get the reply.
+		message = socket.recv()
+
+def main():
+	#  Socket to talk to server
+	
+	# setting up the server
+	context = zmq.Context()
+	server = context.socket(zmq.REP)
+	server.bind("tcp://*:5555")
+
+	try:     
+		thread.start_new_thread(receiver,())
+	except:
+		print("Error")
+
+	while True:
+		#  Wait for next request from client
+		message = server.recv()
+		print("[Lakshadeep]: %s" % message)
+
+		#  Do some 'work'
+		time.sleep(1)
+
+		#  Send reply back to client
+		server.send(" ")
+
+if __name__ == "__main__":
+    main()
+
+
